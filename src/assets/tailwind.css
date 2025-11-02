@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-midnight text-white font-sans;
+  }
+}
+
+@layer components {
+  .neon-card {
+    @apply bg-gradient-purple-smoke border border-[#241033] rounded-3xl backdrop-blur-lg shadow-glow;
+  }
+
+  .floating {
+    animation: floating 6s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  .btn-base {
+    @apply relative inline-flex items-center justify-center rounded-full font-semibold transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-magenta/70;
+  }
+
+  .btn-primary {
+    @apply btn-base bg-gradient-cta text-white px-6 py-3 shadow-glow;
+  }
+
+  .btn-secondary {
+    @apply btn-base bg-transparent border border-neonPurple text-smoke px-5 py-2;
+  }
+
+  .btn-hover-effect:hover {
+    @apply scale-105 shadow-magenta;
+  }
+}
+
+@keyframes floating {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.01);
+  }
+}
