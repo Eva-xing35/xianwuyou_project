@@ -1,0 +1,48 @@
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    phone VARCHAR(20) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    points BIGINT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS blind_boxes (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(128) NOT NULL,
+    cover_url VARCHAR(255) NOT NULL,
+    category VARCHAR(64) NOT NULL,
+    price BIGINT NOT NULL,
+    total_stock BIGINT NOT NULL,
+    remaining_stock BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_category (category)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS prizes (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(128) NOT NULL,
+    image_url VARCHAR(255) NOT NULL,
+    level VARCHAR(8) NOT NULL,
+    probability DECIMAL(6,4) NOT NULL,
+    total_count BIGINT NOT NULL,
+    remaining_count BIGINT NOT NULL,
+    blind_box_id BIGINT UNSIGNED NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_prize_box FOREIGN KEY (blind_box_id) REFERENCES blind_boxes(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS draw_records (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NOT NULL,
+    blind_box_id BIGINT UNSIGNED NOT NULL,
+    prize_id BIGINT UNSIGNED NOT NULL,
+    draw_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(16) NOT NULL DEFAULT '未兑换',
+    address VARCHAR(255) NULL,
+    tracking_no VARCHAR(64) NULL,
+    INDEX idx_user (user_id),
+    INDEX idx_box (blind_box_id),
+    CONSTRAINT fk_draw_user FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT fk_draw_box FOREIGN KEY (blind_box_id) REFERENCES blind_boxes(id),
+    CONSTRAINT fk_draw_prize FOREIGN KEY (prize_id) REFERENCES prizes(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

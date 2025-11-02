@@ -22,7 +22,7 @@
       class="text-[12px] px-3 py-1"
       @click.stop="handleRedeem"
     >
-      &#21435;&#20844;&#25442;
+      &#21435;&#20817;&#25442;
     </BaseButton>
   </div>
 </template>

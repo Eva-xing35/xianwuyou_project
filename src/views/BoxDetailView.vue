@@ -22,7 +22,7 @@
                 <div class="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               </div>
             </Transition>
-            <span class="absolute -left-3 top-1/2 -translate-y-1/2 rotate-90 text-[11px] text-smoke/70">?? 360 ???</span>
+            <span class="absolute -left-3 top-1/2 -translate-y-1/2 rotate-90 text-[11px] text-smoke/70">?? 360? ??</span>
           </div>
         </div>
 
@@ -33,12 +33,12 @@
               <p class="mt-1 text-sm text-smoke/70">{{ box.description }}</p>
             </div>
             <span class="rounded-full border border-magenta/40 bg-black/30 px-3 py-1 text-sm text-magenta">
-              ?{{ box.price.toFixed(1) }} / ?
+              &#165;{{ box.price.toFixed(1) }} / ?
             </span>
           </div>
           <div class="space-y-2">
             <div class="flex items-center justify-between text-xs text-smoke/60">
-              <span>????</span>
+              <span>&#21097;&#20313;&#25968;&#37327;</span>
               <span>{{ box.stock }} / 200</span>
             </div>
             <div class="h-2 rounded-full bg-[#1F0F2A]">
@@ -46,15 +46,15 @@
             </div>
           </div>
           <div class="rounded-2xl border border-[#241033] bg-[#0E0915] p-4 text-sm text-smoke/80">
-            <h3 class="mb-3 text-sm font-semibold text-white">????</h3>
+            <h3 class="mb-3 text-sm font-semibold text-white">&#25277;&#30418;&#35268;&#21017;</h3>
             <ul class="space-y-2 text-xs leading-relaxed">
-              <li>? ???? ?{{ box.price.toFixed(1) }}??????????????</li>
+              <li>&#183; &#21333;&#27425;&#25277;&#30418; &#165;{{ box.price.toFixed(1) }}&#65292;&#21313;&#36830;&#25277;&#20139;&#39069;&#22806;&#38543;&#26426;&#31215;&#20998;&#36192;&#36865;&#12290;</li>
               <li>
-                ? ??????UR {{ box.rarityRates.UR * 100 }}%?SR {{ box.rarityRates.SR * 100 }}%?R {{
+                &#183; &#31232;&#26377;&#24230;&#25481;&#29575;&#65306;UR {{ box.rarityRates.UR * 100 }}%&#12289;SR {{ box.rarityRates.SR * 100 }}%&#12289;R {{
                   box.rarityRates.R * 100
-                }}%?
+                }}%&#12290;
               </li>
-              <li>? ??????????????????????</li>
+              <li>&#183; &#25152;&#26377;&#25277;&#21462;&#35760;&#24405;&#23454;&#26102;&#21516;&#27493;&#33267;&#20010;&#20154;&#20013;&#24515;&#65292;&#21487;&#19968;&#38190;&#20817;&#25442;&#12290;</li>
             </ul>
           </div>
         </div>
@@ -76,8 +76,8 @@
 
     <section class="space-y-5" data-reveal>
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold">????</h3>
-        <span class="text-xs text-smoke/60">???????????</span>
+        <h3 class="text-lg font-semibold">&#25277;&#30418;&#21160;&#20316;</h3>
+        <span class="text-xs text-smoke/60">&#32043;&#33394;&#31890;&#23376;&#21160;&#25928;&#24378;&#21270;&#20202;&#24335;&#24863;</span>
       </div>
       <div class="relative flex flex-col gap-4">
         <div class="relative overflow-hidden rounded-3xl border border-[#241033] bg-[#13091D] p-5">
@@ -94,24 +94,24 @@
           </div>
           <div class="relative z-10 flex flex-col gap-4">
             <p class="text-sm text-smoke/70">
-              ????????????????????????????????? 3D ??????????????
+              &#28857;&#20987;&#19979;&#26041;&#25353;&#38062;&#65292;&#20250;&#35302;&#21457;&#32043;&#33394;&#31890;&#23376;&#29190;&#28856;&#21644;&#29611;&#32418;&#27874;&#32441;&#21453;&#39304;&#12290;&#21152;&#36733;&#36807;&#31243;&#20013;&#20351;&#29992;&#32043;&#33394; 3D &#30450;&#30418;&#22270;&#26631;&#26059;&#36716;&#26469;&#20256;&#36882;&#25277;&#21462;&#29366;&#24577;&#12290;
             </p>
             <div class="grid grid-cols-2 gap-3">
-              <BaseButton class="w-full" :loading="loading" @click="performDraw(1, $event)">??</BaseButton>
-              <BaseButton class="w-full" :loading="loading" @click="performDraw(10, $event)">???</BaseButton>
+              <BaseButton class="w-full" :loading="loading" @click="performDraw(1, $event)">&#21333;&#25277;</BaseButton>
+              <BaseButton class="w-full" :loading="loading" @click="performDraw(10, $event)">&#21313;&#36830;&#25277;</BaseButton>
             </div>
             <div v-if="loading" class="flex items-center gap-3 rounded-2xl border border-[#241033] bg-black/30 px-4 py-3">
               <div class="h-10 w-10 rounded-2xl border border-neonPurple/40 bg-[#1B0F28] p-2">
                 <div class="h-full w-full rounded-xl bg-gradient-to-br from-neonPurple/40 to-magenta/40 animate-drawLoading" />
               </div>
-              <div class="text-sm text-smoke/70">????... ????????</div>
+              <div class="text-sm text-smoke/70">&#27491;&#22312;&#25277;&#21462;... &#32043;&#33394;&#33021;&#37327;&#27491;&#22312;&#27719;&#32858;</div>
             </div>
           </div>
         </div>
       </div>
     </section>
   </div>
-  <div v-else class="flex min-h-[60vh] items-center justify-center text-smoke/60">?????????</div>
+  <div v-else class="flex min-h-[60vh] items-center justify-center text-smoke/60">&#30450;&#30418;&#19981;&#23384;&#22312;&#25110;&#24050;&#19979;&#26550;</div>
 </template>
 
 <script setup lang="ts">

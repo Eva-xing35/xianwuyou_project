@@ -6,8 +6,8 @@
     </div>
     <div class="relative z-10 flex flex-col items-center gap-6 text-center">
       <div class="space-y-3">
-        <h1 class="text-2xl font-semibold tracking-wide">????</h1>
-        <p class="text-sm text-smoke/70">???????????????????????????</p>
+        <h1 class="text-2xl font-semibold tracking-wide">&#25286;&#30418;&#32467;&#26524;</h1>
+        <p class="text-sm text-smoke/70">&#40657;&#33394;&#30418;&#30422;&#32531;&#32531;&#24320;&#21551;&#65292;&#32043;&#33394;&#28895;&#38654;&#25955;&#24320;&#65292;&#26174;&#29616;&#20320;&#30340;&#28526;&#29609;&#28789;&#39746;&#20276;&#20387;&#12290;</p>
       </div>
 
       <Transition name="reveal" mode="out-in">
@@ -21,16 +21,16 @@
             </div>
           </div>
           <div class="rounded-3xl border border-[#241033] bg-black/40 px-6 py-4 text-sm text-smoke/80">
-            <p>?????????????????????</p>
-            <p class="mt-1 text-magenta">??????{{ totalPoints }}</p>
+            <p>&#31215;&#20998;&#22870;&#21169;&#24050;&#21040;&#36134;&#65292;&#24555;&#21435;&#20010;&#20154;&#20013;&#24515;&#26597;&#30475;&#20817;&#25442;&#29366;&#24577;&#12290;</p>
+            <p class="mt-1 text-magenta">&#24403;&#21069;&#24635;&#31215;&#20998;&#65306;{{ totalPoints }}</p>
           </div>
         </div>
-        <div v-else key="empty" class="text-sm text-smoke/60">???????????????</div>
+        <div v-else key="empty" class="text-sm text-smoke/60">&#26242;&#26080;&#25277;&#30418;&#35760;&#24405;&#65292;&#20808;&#21435;&#20307;&#39564;&#30450;&#30418;&#21543;&#12290;</div>
       </Transition>
 
       <div class="flex flex-col gap-3 sm:flex-row">
-        <BaseButton class="w-48" @click="continueDraw">???</BaseButton>
-        <BaseButton class="w-48" variant="secondary" @click="goRedeem">???</BaseButton>
+        <BaseButton class="w-48" @click="continueDraw">&#32487;&#32493;&#25277;</BaseButton>
+        <BaseButton class="w-48" variant="secondary" @click="goRedeem">&#21435;&#20817;&#25442;</BaseButton>
       </div>
     </div>
   </div>

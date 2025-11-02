@@ -1,0 +1,1 @@
+import{u as e}from"./useReveal-DaFxX20s.js";import{d as t,a as o,o as r}from"./index-DprD7ifb.js";const a={class:"rounded-3xl border border-[#241033] bg-[#0F0B15] p-6 text-center text-smoke/70","data-reveal":""},m=t({__name:"CartView",setup(s){return e(),(n,c)=>(r(),o("div",a," 购物车功能正在接入中，预计支持合并收款与会员折扣。 "))}});export{m as default};
