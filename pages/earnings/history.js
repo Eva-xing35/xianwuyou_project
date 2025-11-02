@@ -30,7 +30,7 @@ Page({
       const items = (res?.data || []).map(item => ({
         ...item,
         amount: formatCurrency(item.amount),
-        settledAt: item.settledAt ? formatDate(item.settledAt) : "Pending"
+        settledAt: item.settledAt ? formatDate(item.settledAt) : "???"
       }));
       const list = reset ? items : [...this.data.list, ...items];
       this.setData({

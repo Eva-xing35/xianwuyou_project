@@ -3,7 +3,7 @@ const config = require("../config/index");
 function request({ url, method = "GET", data = {}, header = {}, showLoading = true }) {
   return new Promise((resolve, reject) => {
     if (showLoading) {
-      wx.showLoading({ title: "Loading", mask: true });
+      wx.showLoading({ title: "???", mask: true });
     }
 
     wx.request({
@@ -36,7 +36,7 @@ function request({ url, method = "GET", data = {}, header = {}, showLoading = tr
 }
 
 function handleError(error) {
-  const message = error?.message || error?.msg || "Request failed, try again later";
+  const message = error?.message || error?.msg || "??????????";
   wx.showToast({ title: message, icon: "none", duration: 2000 });
 }
 

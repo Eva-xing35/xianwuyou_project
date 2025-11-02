@@ -1,52 +1,52 @@
 <view class="page-container">
   <view class="card">
-    <view class="section-title">Personal Info</view>
+    <view class="section-title">个人信息</view>
     <view class="form-item">
-      <text class="label">Name</text>
-      <input class="input" placeholder="Enter full name" value="{{form.name}}" data-field="name" bindinput="handleInput" />
+      <text class="label">姓名</text>
+      <input class="input" placeholder="请输入姓名" value="{{form.name}}" data-field="name" bindinput="handleInput" />
       <text class="error" wx:if="{{errors.name}}">{{errors.name}}</text>
     </view>
     <view class="form-item">
-      <text class="label">Mobile</text>
-      <input class="input" type="number" placeholder="Enter mobile number" value="{{form.phone}}" data-field="phone" bindinput="handleInput" />
+      <text class="label">手机号</text>
+      <input class="input" type="number" placeholder="请输入手机号" value="{{form.phone}}" data-field="phone" bindinput="handleInput" />
       <text class="error" wx:if="{{errors.phone}}">{{errors.phone}}</text>
     </view>
     <view class="form-item">
-      <text class="label">ID Number</text>
-      <input class="input" placeholder="Enter ID or passport" value="{{form.idNumber}}" data-field="idNumber" bindinput="handleInput" />
+      <text class="label">身份证号</text>
+      <input class="input" placeholder="请输入身份证号" value="{{form.idNumber}}" data-field="idNumber" bindinput="handleInput" />
       <text class="error" wx:if="{{errors.idNumber}}">{{errors.idNumber}}</text>
     </view>
   </view>
 
   <view class="card">
-    <view class="section-title">Vehicle Info</view>
+    <view class="section-title">车辆信息</view>
     <view class="form-item">
-      <text class="label">License Plate</text>
-      <input class="input" placeholder="Enter vehicle plate" value="{{form.vehicleNumber}}" data-field="vehicleNumber" bindinput="handleInput" />
+      <text class="label">车牌号</text>
+      <input class="input" placeholder="请输入车牌号" value="{{form.vehicleNumber}}" data-field="vehicleNumber" bindinput="handleInput" />
       <text class="error" wx:if="{{errors.vehicleNumber}}">{{errors.vehicleNumber}}</text>
     </view>
     <view class="form-item">
-      <text class="label">Driver License</text>
-      <input class="input" placeholder="Enter license number" value="{{form.driverLicense}}" data-field="driverLicense" bindinput="handleInput" />
+      <text class="label">驾驶证号</text>
+      <input class="input" placeholder="请输入驾驶证号" value="{{form.driverLicense}}" data-field="driverLicense" bindinput="handleInput" />
       <text class="error" wx:if="{{errors.driverLicense}}">{{errors.driverLicense}}</text>
     </view>
   </view>
 
-  <button class="primary-btn" bindtap="submit">Save Profile</button>
+  <button class="primary-btn" bindtap="submit">保存信息</button>
 
   <view class="card link-card" bindtap="goToTripHistory">
     <view class="text">
-      <text class="title">Trip History</text>
-      <text class="desc">Review completed ride records</text>
+      <text class="title">行程历史</text>
+      <text class="desc">查询过往出车记录</text>
     </view>
-    <text class="arrow">?</text>
+    <text class="arrow">›</text>
   </view>
 
   <view class="card link-card" bindtap="goToWithdrawProgress">
     <view class="text">
-      <text class="title">Withdrawal Progress</text>
-      <text class="desc">Track payouts and approval status</text>
+      <text class="title">提现进度</text>
+      <text class="desc">查看提现审核及到账状态</text>
     </view>
-    <text class="arrow">?</text>
+    <text class="arrow">›</text>
   </view>
 </view>

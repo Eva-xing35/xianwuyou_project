@@ -2,17 +2,17 @@ const orderService = require("../../services/orderService");
 const { formatDate, formatCurrency } = require("../../utils/format");
 
 const STATUS_MAP = {
-  pending: { label: "Pending", showActions: true },
-  accepted: { label: "In Progress", showActions: false },
-  completed: { label: "Completed", showActions: false }
+  pending: { label: "???", showActions: true },
+  accepted: { label: "???", showActions: false },
+  completed: { label: "???", showActions: false }
 };
 
 Page({
   data: {
     tabs: [
-      { key: "pending", text: "Pending" },
-      { key: "accepted", text: "In Progress" },
-      { key: "completed", text: "Completed" }
+      { key: "pending", text: "???" },
+      { key: "accepted", text: "???" },
+      { key: "completed", text: "???" }
     ],
     activeStatus: "pending",
     list: [],
@@ -82,7 +82,7 @@ Page({
     const orderId = event.detail.orderId;
     try {
       await orderService.acceptOrder(orderId);
-      wx.showToast({ title: "Order accepted", icon: "success" });
+      wx.showToast({ title: "????", icon: "success" });
       this.loadOrders(true);
     } catch (error) {
       console.error("accept order", error);
@@ -93,7 +93,7 @@ Page({
     const orderId = event.detail.orderId;
     try {
       await orderService.rejectOrder(orderId);
-      wx.showToast({ title: "Order declined", icon: "none" });
+      wx.showToast({ title: "??????", icon: "none" });
       this.loadOrders(true);
     } catch (error) {
       console.error("reject order", error);

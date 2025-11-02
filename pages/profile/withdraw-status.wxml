@@ -3,19 +3,19 @@
     <block wx:for="{{list}}" wx:key="id">
       <view class="card progress-item">
         <view class="header">
-          <text class="amount">?{{item.amount}}</text>
+          <text class="amount">￥{{item.amount}}</text>
           <text class="status">{{item.statusText}}</text>
         </view>
         <view class="row">
-          <text class="label">Account Type</text>
-          <text class="value">{{item.accountType === 'corporate' ? 'Corporate account' : 'Personal account'}}</text>
+          <text class="label">账户类型</text>
+          <text class="value">{{item.accountType === 'corporate' ? '对公账户' : '对私账户'}}</text>
         </view>
         <view class="row">
-          <text class="label">Applied At</text>
+          <text class="label">提交时间</text>
           <text class="value">{{item.appliedAt}}</text>
         </view>
         <view class="row">
-          <text class="label">Last Update</text>
+          <text class="label">最新进度</text>
           <text class="value">{{item.updatedAt}}</text>
         </view>
         <view class="timeline" wx:if="{{item.timeline?.length}}">
@@ -31,8 +31,8 @@
         </view>
       </view>
     </block>
-    <view wx:if="{{loading}}" class="loading">Refreshing?</view>
+    <view wx:if="{{loading}}" class="loading">刷新中…</view>
   </view>
 
-  <view wx:else class="empty">No withdrawal requests yet</view>
+  <view wx:else class="empty">暂无提现申请</view>
 </view>

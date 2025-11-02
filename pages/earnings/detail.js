@@ -13,7 +13,7 @@ Page({
       this.setData({ orderId: options.orderId });
       this.loadDetail();
     } else {
-      wx.showToast({ title: "Missing order id", icon: "none" });
+      wx.showToast({ title: "??????", icon: "none" });
     }
   },
 
@@ -32,7 +32,7 @@ Page({
         orderAmount: formatCurrency(detail.orderAmount),
         driverShare: formatCurrency(detail.driverShare),
         platformFee: formatCurrency(detail.platformFee),
-        settledAt: detail.settledAt ? formatDate(detail.settledAt) : "Pending settlement",
+        settledAt: detail.settledAt ? formatDate(detail.settledAt) : "???",
         items: (detail.items || []).map(item => ({
           ...item,
           amount: formatCurrency(item.amount)

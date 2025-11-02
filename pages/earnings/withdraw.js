@@ -36,19 +36,19 @@ Page({
     const errors = {};
 
     if (!validators.validateRequired(form.accountName)) {
-      errors.accountName = "Enter the account holder name";
+      errors.accountName = "???????";
     }
 
     if (!validators.validateBankAccount(form.bankAccount, form.accountType === "corporate" ? "corporate" : "personal")) {
-      errors.bankAccount = form.accountType === "corporate" ? "Corporate accounts must be 12-30 digits" : "Personal accounts must be 10-18 digits";
+      errors.bankAccount = form.accountType === "corporate" ? "??????12-30???" : "??????10-18???";
     }
 
     if (!validators.validateRequired(form.idNumber) || !validators.validateIdNumber(form.idNumber)) {
-      errors.idNumber = "Enter a valid ID or license";
+      errors.idNumber = "????????";
     }
 
     if (!form.amount || Number(form.amount) <= 0) {
-      errors.amount = "Enter an amount greater than 0";
+      errors.amount = "?????0???";
     }
 
     this.setData({ errors });
@@ -59,7 +59,7 @@ Page({
     if (!this.validate()) return;
     try {
       await earningsService.submitWithdrawApplication(this.data.form);
-      wx.showToast({ title: "Submitted", icon: "success" });
+      wx.showToast({ title: "????", icon: "success" });
       setTimeout(() => {
         wx.navigateBack({ delta: 1 });
       }, 1200);

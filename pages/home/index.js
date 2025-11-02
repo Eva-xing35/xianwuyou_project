@@ -96,7 +96,7 @@ Page({
     if (!incomingOrder) return;
     try {
       await orderService.acceptOrder(incomingOrder.id);
-      wx.showToast({ title: "Order accepted", icon: "success" });
+      wx.showToast({ title: "????", icon: "success" });
       this.setData({ incomingOrder: null });
       this.loadSummary();
     } catch (error) {
@@ -109,7 +109,7 @@ Page({
     if (!incomingOrder) return;
     try {
       await orderService.rejectOrder(incomingOrder.id);
-      wx.showToast({ title: "Order declined", icon: "none" });
+      wx.showToast({ title: "??????", icon: "none" });
       this.setData({ incomingOrder: null });
       this.loadSummary();
     } catch (error) {

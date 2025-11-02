@@ -43,11 +43,11 @@ Page({
     const { form } = this.data;
     const errors = {};
 
-    if (!validators.validateRequired(form.name)) errors.name = "Please enter a name";
-    if (!validators.validatePhone(form.phone)) errors.phone = "Enter a valid phone number";
-    if (!validators.validateIdNumber(form.idNumber)) errors.idNumber = "Enter a valid ID number";
-    if (!validators.validateRequired(form.vehicleNumber)) errors.vehicleNumber = "Enter a license plate";
-    if (!validators.validateRequired(form.driverLicense)) errors.driverLicense = "Enter a driver license";
+    if (!validators.validateRequired(form.name)) errors.name = "?????";
+    if (!validators.validatePhone(form.phone)) errors.phone = "????????";
+    if (!validators.validateIdNumber(form.idNumber)) errors.idNumber = "????????";
+    if (!validators.validateRequired(form.vehicleNumber)) errors.vehicleNumber = "??????";
+    if (!validators.validateRequired(form.driverLicense)) errors.driverLicense = "???????";
 
     this.setData({ errors });
     return Object.keys(errors).length === 0;
@@ -57,7 +57,7 @@ Page({
     if (!this.validate()) return;
     try {
       await profileService.updateProfile(this.data.form);
-      wx.showToast({ title: "Profile saved", icon: "success" });
+      wx.showToast({ title: "????", icon: "success" });
     } catch (error) {
       console.error("updateProfile", error);
     }

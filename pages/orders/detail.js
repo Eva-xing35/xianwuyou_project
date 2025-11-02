@@ -15,7 +15,7 @@ Page({
       this.setData({ orderId: options.id });
       this.loadOrder();
     } else {
-      wx.showToast({ title: "Order not found", icon: "none" });
+      wx.showToast({ title: "???????", icon: "none" });
     }
   },
 
@@ -26,7 +26,7 @@ Page({
   async loadOrder() {
     const { orderId } = this.data;
     if (!orderId) return;
-    wx.showLoading({ title: "Loading" });
+    wx.showLoading({ title: "???" });
     try {
       const data = await orderService.fetchOrderDetail(orderId);
       const order = {
@@ -46,20 +46,20 @@ Page({
   mapStatus(status) {
     switch (status) {
       case "pending":
-        return "Pending";
+        return "???";
       case "accepted":
-        return "In Progress";
+        return "???";
       case "completed":
-        return "Completed";
+        return "???";
       default:
-        return "Unknown";
+        return "??";
     }
   },
 
   callCustomer() {
     const phone = this.data.order?.customerPhone;
     if (!phone) {
-      wx.showToast({ title: "No phone available", icon: "none" });
+      wx.showToast({ title: "??????", icon: "none" });
       return;
     }
     wx.makePhoneCall({ phoneNumber: phone });
@@ -76,7 +76,7 @@ Page({
     if (!order) return;
     try {
       await orderService.acceptOrder(order.id);
-      wx.showToast({ title: "Order accepted", icon: "success" });
+      wx.showToast({ title: "????", icon: "success" });
       this.loadOrder();
     } catch (error) {
       console.error("accept order", error);
@@ -88,7 +88,7 @@ Page({
     if (!order) return;
     try {
       await orderService.rejectOrder(order.id);
-      wx.showToast({ title: "Order declined", icon: "none" });
+      wx.showToast({ title: "??????", icon: "none" });
       this.loadOrder();
     } catch (error) {
       console.error("reject order", error);
@@ -98,7 +98,7 @@ Page({
   async handleNavigation() {
     const order = this.data.order;
     if (!order?.originLocation || !order?.destinationLocation) {
-      wx.showToast({ title: "Missing location info", icon: "none" });
+      wx.showToast({ title: "??????", icon: "none" });
       return;
     }
     this.setData({ loadingRoute: true, routeSteps: [] });
@@ -124,7 +124,7 @@ Page({
       });
     } catch (error) {
       console.error("handleNavigation", error);
-      wx.showToast({ title: "Navigation failed", icon: "none" });
+      wx.showToast({ title: "????", icon: "none" });
     } finally {
       this.setData({ loadingRoute: false });
     }
