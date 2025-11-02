@@ -1,0 +1,52 @@
+<view class="page-container">
+  <view class="card">
+    <view class="section-title">Personal Info</view>
+    <view class="form-item">
+      <text class="label">Name</text>
+      <input class="input" placeholder="Enter full name" value="{{form.name}}" data-field="name" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.name}}">{{errors.name}}</text>
+    </view>
+    <view class="form-item">
+      <text class="label">Mobile</text>
+      <input class="input" type="number" placeholder="Enter mobile number" value="{{form.phone}}" data-field="phone" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.phone}}">{{errors.phone}}</text>
+    </view>
+    <view class="form-item">
+      <text class="label">ID Number</text>
+      <input class="input" placeholder="Enter ID or passport" value="{{form.idNumber}}" data-field="idNumber" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.idNumber}}">{{errors.idNumber}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">Vehicle Info</view>
+    <view class="form-item">
+      <text class="label">License Plate</text>
+      <input class="input" placeholder="Enter vehicle plate" value="{{form.vehicleNumber}}" data-field="vehicleNumber" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.vehicleNumber}}">{{errors.vehicleNumber}}</text>
+    </view>
+    <view class="form-item">
+      <text class="label">Driver License</text>
+      <input class="input" placeholder="Enter license number" value="{{form.driverLicense}}" data-field="driverLicense" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.driverLicense}}">{{errors.driverLicense}}</text>
+    </view>
+  </view>
+
+  <button class="primary-btn" bindtap="submit">Save Profile</button>
+
+  <view class="card link-card" bindtap="goToTripHistory">
+    <view class="text">
+      <text class="title">Trip History</text>
+      <text class="desc">Review completed ride records</text>
+    </view>
+    <text class="arrow">?</text>
+  </view>
+
+  <view class="card link-card" bindtap="goToWithdrawProgress">
+    <view class="text">
+      <text class="title">Withdrawal Progress</text>
+      <text class="desc">Track payouts and approval status</text>
+    </view>
+    <text class="arrow">?</text>
+  </view>
+</view>

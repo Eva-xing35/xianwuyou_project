@@ -1,0 +1,38 @@
+<view class="page-container">
+  <view wx:if="{{list.length}}">
+    <block wx:for="{{list}}" wx:key="id">
+      <view class="card progress-item">
+        <view class="header">
+          <text class="amount">?{{item.amount}}</text>
+          <text class="status">{{item.statusText}}</text>
+        </view>
+        <view class="row">
+          <text class="label">Account Type</text>
+          <text class="value">{{item.accountType === 'corporate' ? 'Corporate account' : 'Personal account'}}</text>
+        </view>
+        <view class="row">
+          <text class="label">Applied At</text>
+          <text class="value">{{item.appliedAt}}</text>
+        </view>
+        <view class="row">
+          <text class="label">Last Update</text>
+          <text class="value">{{item.updatedAt}}</text>
+        </view>
+        <view class="timeline" wx:if="{{item.timeline?.length}}">
+          <block wx:for="{{item.timeline}}" wx:key="time">
+            <view class="timeline-row">
+              <view class="dot {{item.completed ? 'done' : ''}}"></view>
+              <view class="timeline-text">
+                <text class="title">{{item.title}}</text>
+                <text class="time">{{item.time}}</text>
+              </view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{loading}}" class="loading">Refreshing?</view>
+  </view>
+
+  <view wx:else class="empty">No withdrawal requests yet</view>
+</view>

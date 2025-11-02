@@ -1,0 +1,46 @@
+<view class="page-container">
+  <view class="card">
+    <view class="section-title">Payout Account</view>
+    <radio-group class="type-group" bindchange="handleAccountTypeChange" value="{{form.accountType}}">
+      <label class="type-option">
+        <radio value="personal" checked="{{form.accountType === 'personal'}}" />
+        <text>Personal</text>
+      </label>
+      <label class="type-option">
+        <radio value="corporate" checked="{{form.accountType === 'corporate'}}" />
+        <text>Corporate</text>
+      </label>
+    </radio-group>
+
+    <view class="form-item">
+      <text class="label">Account Holder</text>
+      <input class="input" placeholder="Enter account name" value="{{form.accountName}}" data-field="accountName" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.accountName}}">{{errors.accountName}}</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">Bank Account</text>
+      <input class="input" placeholder="Enter bank account number" value="{{form.bankAccount}}" data-field="bankAccount" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.bankAccount}}">{{errors.bankAccount}}</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">ID / License</text>
+      <input class="input" placeholder="Enter ID or business license" value="{{form.idNumber}}" data-field="idNumber" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.idNumber}}">{{errors.idNumber}}</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">Amount (?)</text>
+      <input class="input" type="number" placeholder="Enter withdrawal amount" value="{{form.amount}}" data-field="amount" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.amount}}">{{errors.amount}}</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">Notes</text>
+      <textarea class="textarea" placeholder="Optional notes or invoice requirements" value="{{form.remark}}" data-field="remark" bindinput="handleInput"></textarea>
+    </view>
+  </view>
+
+  <button class="primary-btn submit-btn" bindtap="submit">Submit Request</button>
+</view>

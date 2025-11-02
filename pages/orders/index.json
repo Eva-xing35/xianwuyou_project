@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "Orders",
+  "usingComponents": {
+    "order-card": "/components/order-card/index"
+  }
+}

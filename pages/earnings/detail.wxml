@@ -1,0 +1,48 @@
+<view class="page-container" wx:if="{{detail}}">
+  <view class="card">
+    <view class="section-title">Order Summary</view>
+    <view class="row">
+      <text class="label">Order #</text>
+      <text class="value">{{detail.orderId}}</text>
+    </view>
+    <view class="row">
+      <text class="label">Rider</text>
+      <text class="value">{{detail.customerName}}</text>
+    </view>
+    <view class="row">
+      <text class="label">Order Amount</text>
+      <text class="value highlight">?{{detail.orderAmount}}</text>
+    </view>
+    <view class="row">
+      <text class="label">Settlement Time</text>
+      <text class="value">{{detail.settledAt}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">Split Overview</view>
+    <view class="row">
+      <text class="label">Driver Share</text>
+      <text class="value">?{{detail.driverShare}}</text>
+    </view>
+    <view class="row">
+      <text class="label">Platform Fee</text>
+      <text class="value">?{{detail.platformFee}}</text>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{detail.items.length}}">
+    <view class="section-title">Breakdown</view>
+    <block wx:for="{{detail.items}}" wx:key="name">
+      <view class="item-row">
+        <view class="item-left">
+          <text class="item-title">{{item.name}}</text>
+          <text class="item-desc">{{item.description}}</text>
+        </view>
+        <text class="item-amount">?{{item.amount}}</text>
+      </view>
+    </block>
+  </view>
+</view>
+
+<view wx:else class="empty">Loading share data?</view>

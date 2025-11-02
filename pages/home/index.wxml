@@ -1,0 +1,67 @@
+<view class="page-container">
+  <view class="card status-card">
+    <view class="status-header">
+      <text class="title">Auto Accept Orders</text>
+      <switch checked="{{autoAccept}}" bindchange="handleAutoAcceptChange" color="#2563EB" />
+    </view>
+    <text class="status-desc">Enable to automatically take matching jobs</text>
+  </view>
+
+  <view class="summary-grid">
+    <view class="summary-item card">
+      <text class="label">Pending Orders</text>
+      <text class="value">{{summary.waitingOrders}}</text>
+    </view>
+    <view class="summary-item card">
+      <text class="label">Completed Today</text>
+      <text class="value">{{summary.todayCompleted}}</text>
+    </view>
+    <view class="summary-item card">
+      <text class="label">Earnings Today (?)</text>
+      <text class="value earnings">{{summary.todayEarnings}}</text>
+    </view>
+    <view class="summary-item card">
+      <text class="label">Service Rating</text>
+      <text class="value">{{summary.rating}}</text>
+    </view>
+  </view>
+
+  <view class="card order-entry" bindtap="navigateToOrderList">
+    <view class="entry-text">
+      <text class="title">Order Center</text>
+      <text class="desc">View pending jobs and trip schedule</text>
+    </view>
+    <text class="arrow">?</text>
+  </view>
+
+  <view wx:if="{{incomingOrder}}" class="modal-mask" catchtouchmove="true">
+    <view class="modal-content">
+      <text class="modal-title">New Order Alert</text>
+      <view class="modal-row">
+        <text class="label">Pickup</text>
+        <text class="value">{{incomingOrder.origin}}</text>
+      </view>
+      <view class="modal-row">
+        <text class="label">Drop-off</text>
+        <text class="value">{{incomingOrder.destination}}</text>
+      </view>
+      <view class="modal-row">
+        <text class="label">Start Time</text>
+        <text class="value">{{incomingOrder.departureTime}}</text>
+      </view>
+      <view class="modal-row">
+        <text class="label">Estimated Fare</text>
+        <text class="value highlight">?{{incomingOrder.fare}}</text>
+      </view>
+      <view class="modal-actions">
+        <button class="reject" bindtap="handleRejectIncoming">Reject</button>
+        <button class="accept" bindtap="handleAcceptIncoming">Accept</button>
+      </view>
+      <button class="modal-close" bindtap="closeIncomingModal">Remind me later</button>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-hint">
+    <text>Loading?</text>
+  </view>
+</view>

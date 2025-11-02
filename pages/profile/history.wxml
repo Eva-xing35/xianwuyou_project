@@ -1,0 +1,20 @@
+<view class="page-container">
+  <view wx:if="{{list.length}}">
+    <block wx:for="{{list}}" wx:key="id">
+      <view class="card trip-item">
+        <view class="row">
+          <text class="route">{{item.origin}} ? {{item.destination}}</text>
+          <text class="amount">?{{item.amount}}</text>
+        </view>
+        <view class="row secondary">
+          <text>{{item.departAt}}</text>
+          <text>Passengers {{item.passengerCount}}</text>
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{loading}}" class="loading">Loading?</view>
+    <view wx:elif="{{!hasMore}}" class="loading">No more trips</view>
+  </view>
+
+  <view wx:else class="empty">No trip history yet</view>
+</view>

@@ -1,0 +1,38 @@
+.trip-item {
+  margin-bottom: 24rpx;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.route {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.amount {
+  color: #16a34a;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.secondary {
+  color: #6b7280;
+  font-size: 24rpx;
+}
+
+.loading {
+  text-align: center;
+  color: #9ca3af;
+  padding: 24rpx 0;
+}
+
+.empty {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 120rpx;
+}

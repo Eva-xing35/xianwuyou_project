@@ -1,0 +1,16 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "driver-fulfillment-miniapp",
+  "description": "司机端履约闭环微信小程序",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.0.0",
+  "condition": {}
+}

@@ -1,0 +1,24 @@
+<view class="page-container">
+  <view wx:if="{{list.length}}">
+    <block wx:for="{{list}}" wx:key="id">
+      <view class="card history-item" data-order-id="{{item.orderId}}" bindtap="goToDetail">
+        <view class="row">
+          <text class="title">Order # {{item.orderId}}</text>
+          <text class="amount">?{{item.amount}}</text>
+        </view>
+        <view class="row">
+          <text class="label">Settlement</text>
+          <text class="status">{{item.settlementStatus}}</text>
+        </view>
+        <view class="row">
+          <text class="label">Updated At</text>
+          <text class="value">{{item.settledAt}}</text>
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{loading}}" class="loading">Loading?</view>
+    <view wx:elif="{{!hasMore}}" class="loading">No more records</view>
+  </view>
+
+  <view wx:else class="empty">No earnings records yet</view>
+</view>

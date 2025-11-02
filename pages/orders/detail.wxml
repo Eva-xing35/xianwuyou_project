@@ -1,0 +1,67 @@
+<view class="page-container" wx:if="{{order}}">
+  <view class="card">
+    <view class="section-title">Trip Information</view>
+    <view class="row" data-value="{{order.origin}}" bindtap="copyAddress">
+      <text class="label">Pickup</text>
+      <text class="value">{{order.origin}}</text>
+    </view>
+    <view class="row" data-value="{{order.destination}}" bindtap="copyAddress">
+      <text class="label">Drop-off</text>
+      <text class="value">{{order.destination}}</text>
+    </view>
+    <view class="row">
+      <text class="label">Start Time</text>
+      <text class="value">{{order.departureTime}}</text>
+    </view>
+    <view class="row">
+      <text class="label">Passengers</text>
+      <text class="value">{{order.passengerCount}}</text>
+    </view>
+    <view class="row">
+      <text class="label">Quote</text>
+      <text class="value highlight">?{{order.fare}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">Rider Contact</view>
+    <view class="row">
+      <text class="label">Name</text>
+      <text class="value">{{order.customerName}}</text>
+    </view>
+    <view class="row">
+      <text class="label">Phone</text>
+      <text class="value">{{order.customerPhone}}</text>
+      <button class="mini-btn" size="mini" bindtap="callCustomer">Call</button>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">Google Directions</view>
+    <button class="primary-btn" bindtap="handleNavigation" loading="{{loadingRoute}}">Plan Route</button>
+    <view class="steps" wx:if="{{routeSteps.length}}">
+      <block wx:for="{{routeSteps}}" wx:key="index">
+        <view class="step-item">
+          <text class="step-index">{{item.index}}</text>
+          <view class="step-body">
+            <text class="instruction">{{item.instruction}}</text>
+            <text class="secondary">{{item.distance}} ? {{item.duration}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">Status</view>
+    <view class="status-line">
+      <text class="tag">{{order.statusText}}</text>
+    </view>
+    <view class="actions" wx:if="{{order.status === 'pending'}}">
+      <button class="danger-btn" bindtap="handleReject">Reject Order</button>
+      <button class="primary-btn" bindtap="handleAccept">Accept Order</button>
+    </view>
+  </view>
+</view>
+
+<view wx:else class="empty">Loading order?</view>
