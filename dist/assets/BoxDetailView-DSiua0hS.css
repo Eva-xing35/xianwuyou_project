@@ -1,0 +1,1 @@
+.flip-enter-active[data-v-d1d1343d],.flip-leave-active[data-v-d1d1343d]{transition:opacity .4s ease,transform .4s ease}.flip-enter-from[data-v-d1d1343d]{opacity:0;transform:rotateY(-30deg) scale(.95)}.flip-leave-to[data-v-d1d1343d]{opacity:0;transform:rotateY(30deg) scale(.95)}

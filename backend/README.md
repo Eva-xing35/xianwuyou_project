@@ -1,6 +1,6 @@
 # Blind Box Backend Service
 
-Go 1.22 + Gin + GORM + MySQL + Redis backend supporting the blind box mini-program. Includes JWT auth, distributed locking, Redis-based rate limiting, and Docker support.
+Go 1.23 + Gin + GORM + MySQL + Redis backend supporting the blind box mini-program. Includes JWT auth, distributed locking, Redis-based rate limiting, structured logging, and SMS gateway integration.
 
 ## Environment Variables
 
@@ -15,6 +15,11 @@ Go 1.22 + Gin + GORM + MySQL + Redis backend supporting the blind box mini-progr
 | `AUTH_VERIFICATION_TTL` | SMS code TTL (default `5m`) |
 | `LIMIT_DRAW_PER_MINUTE` | Per-user draw limit per minute (default `10`) |
 | `LIMIT_DRAW_QPS` | Draw QPS limit for global/user windows (default `100`) |
+| `SMS_PROVIDER` | SMS provider identifier (`mock` to disable outbound delivery) |
+| `SMS_ENDPOINT` | SMS gateway HTTP endpoint (required when provider != mock) |
+| `SMS_API_KEY` / `SMS_API_SECRET` | API credentials forwarded as headers |
+| `SMS_SIGN_NAME` / `SMS_TEMPLATE_ID` | Provider-specific sign/template identifiers |
+| `LOG_LEVEL` | Log level (`debug`, `info`, `warn`, `error`) |
 
 ## Run locally
 
@@ -25,9 +30,17 @@ go run ./cmd/server
 
 Ensure MySQL and Redis are reachable per the DSN/env above. Initial schema provided in `database/migrations/001_init.sql`.
 
+Run the automated regression suite (SQLite + MiniRedis) with:
+
+```bash
+go test ./...
+```
+
 ## Docker
 
 ```bash
+docker compose up -d backend
+# or build image manually
 docker build -t blindbox-backend .
 docker run -p 8080:8080 --env-file .env blindbox-backend
 ```

@@ -43,6 +43,7 @@ type DrawRecord struct {
     Status     string    `gorm:"size:16" json:"status"`
     Address    string    `gorm:"size:255" json:"address,omitempty"`
     TrackingNo string    `gorm:"size:64" json:"tracking_no,omitempty"`
+    Prize      Prize     `gorm:"foreignKey:PrizeID" json:"prize,omitempty"`
 }
 
 func (BlindBox) TableName() string { return "blind_boxes" }

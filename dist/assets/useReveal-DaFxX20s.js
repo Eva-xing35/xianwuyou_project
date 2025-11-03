@@ -1,1 +1,0 @@
-import{i as s,j as a}from"./index-DprD7ifb.js";function l(o="[data-reveal]"){let e=null;s(()=>{e=new IntersectionObserver(t=>{t.forEach(n=>{n.isIntersecting&&n.target.classList.add("is-visible")})},{threshold:.2}),document.querySelectorAll(o).forEach(t=>e==null?void 0:e.observe(t))}),a(()=>{e==null||e.disconnect()})}export{l as u};

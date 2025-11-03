@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDrawStore } from '../stores/draw';
 import BaseButton from '../components/BaseButton.vue';
@@ -112,7 +112,7 @@ const blindBoxes = computed(() => drawStore.blindBoxes);
 const categories = computed(() => drawStore.categories);
 
 // Carousel state controls animated gradient transitions per series card
-const activeId = ref(carouselItems.value[0]?.id ?? '');
+const activeId = ref('');
 const activeBox = computed(() => carouselItems.value.find((item) => item.id === activeId.value) ?? carouselItems.value[0]);
 
 let interval: number | undefined;
@@ -125,12 +125,25 @@ const goDetail = (id: string) => {
   router.push({ name: 'detail', params: { id } });
 };
 
+watch(
+  carouselItems,
+  (items) => {
+    if (!items.length) return;
+    activeId.value = items[0].id;
+    if (interval) window.clearInterval(interval);
+    interval = window.setInterval(() => {
+      const currentIndex = items.findIndex((item) => item.id === activeId.value);
+      const next = items[(currentIndex + 1) % items.length];
+      if (next) activeId.value = next.id;
+    }, 4500);
+  },
+  { immediate: true }
+);
+
 onMounted(() => {
-  interval = window.setInterval(() => {
-    const currentIndex = carouselItems.value.findIndex((item) => item.id === activeId.value);
-    const next = carouselItems.value[(currentIndex + 1) % carouselItems.value.length];
-    if (next) activeId.value = next.id;
-  }, 4500);
+  drawStore.ensureInitialized().catch((error) => {
+    console.error('[home] failed to initialise store', error);
+  });
 });
 
 onBeforeUnmount(() => {

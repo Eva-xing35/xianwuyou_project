@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { RouterLink } from 'vue-router';
 import PrizeCard from '../components/PrizeCard.vue';
 import { useDrawStore } from '../stores/draw';
@@ -59,9 +59,14 @@ const prizes = computed(() => store.prizes);
 const totalPoints = computed(() => store.totalPoints);
 const balance = computed(() => store.balance);
 
-const handleRedeem = (id: string) => {
-  store.markRedeemed(id);
+const handleRedeem = async (id: string) => {
+  await store.markRedeemed(id);
 };
+
+onMounted(async () => {
+  await store.ensureInitialized();
+  await store.loadProfile();
+});
 
 useReveal();
 </script>

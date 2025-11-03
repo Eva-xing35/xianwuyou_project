@@ -108,7 +108,11 @@ func (r *Repository) CreateDrawRecord(tx *gorm.DB, record *models.DrawRecord) er
 
 func (r *Repository) GetUserPrizes(ctx context.Context, userID uint) ([]models.DrawRecord, error) {
     var records []models.DrawRecord
-    err := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("draw_time DESC").Find(&records).Error
+    err := r.db.WithContext(ctx).
+        Preload("Prize").
+        Where("user_id = ?", userID).
+        Order("draw_time DESC").
+        Find(&records).Error
     return records, err
 }
 

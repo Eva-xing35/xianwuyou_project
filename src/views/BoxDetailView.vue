@@ -22,7 +22,7 @@
                 <div class="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               </div>
             </Transition>
-            <span class="absolute -left-3 top-1/2 -translate-y-1/2 rotate-90 text-[11px] text-smoke/70">?? 360? ??</span>
+            <span class="absolute -left-3 top-1/2 -translate-y-1/2 rotate-90 text-[11px] text-smoke/70">&#25302;&#21160; 360&#176; &#39044;&#35272;</span>
           </div>
         </div>
 
@@ -33,13 +33,13 @@
               <p class="mt-1 text-sm text-smoke/70">{{ box.description }}</p>
             </div>
             <span class="rounded-full border border-magenta/40 bg-black/30 px-3 py-1 text-sm text-magenta">
-              &#165;{{ box.price.toFixed(1) }} / ?
+              &#165;{{ box.price.toFixed(1) }} / &#27425;
             </span>
           </div>
           <div class="space-y-2">
             <div class="flex items-center justify-between text-xs text-smoke/60">
               <span>&#21097;&#20313;&#25968;&#37327;</span>
-              <span>{{ box.stock }} / 200</span>
+              <span>{{ box.stock }} / {{ box.totalStock }}</span>
             </div>
             <div class="h-2 rounded-full bg-[#1F0F2A]">
               <div class="h-full rounded-full bg-magenta" :style="{ width: stockPercent }" />
@@ -126,7 +126,12 @@ const router = useRouter();
 const store = useDrawStore();
 
 const box = computed(() => store.blindBoxes.find((item) => item.id === route.params.id));
-const stockPercent = computed(() => `${Math.max(0, Math.min(100, box.value ? (box.value.stock / 200) * 100 : 0))}%`);
+const stockPercent = computed(() => {
+  if (!box.value) return '0%';
+  const total = box.value.totalStock || 1;
+  const percent = Math.max(0, Math.min(100, (box.value.stock / total) * 100));
+  return `${percent.toFixed(0)}%`;
+});
 
 const activeIndex = ref(0);
 const activeImage = computed(() => box.value?.gallery[activeIndex.value] ?? '');
@@ -183,21 +188,35 @@ const injectBurst = (event?: MouseEvent) => {
 };
 
 const performDraw = async (count: number, event?: MouseEvent) => {
-  if (!box.value || store.loading) return;
+  if (!box.value) return;
+  if (store.loading) return;
   injectBurst(event);
-  await store.simulateDraw(box.value.id, count);
-  router.push({ name: 'result', query: { count: String(count), boxId: box.value.id } });
+  try {
+    const result = await store.performDraw(box.value.id, count);
+    if (result) {
+      router.push({ name: 'result', query: { count: String(count), boxId: box.value.id } });
+    }
+  } catch (error) {
+    console.error('[draw] failed', error);
+  }
 };
 
 watch(
   () => route.params.id,
-  () => {
+  async (id) => {
     activeIndex.value = 0;
     rotation.value = 0;
+    if (typeof id === 'string' || typeof id === 'number') {
+      await store.loadBlindBoxDetail(String(id));
+    }
   }
 );
 
-onMounted(() => {
+onMounted(async () => {
+  await store.ensureInitialized();
+  if (typeof route.params.id === 'string') {
+    await store.loadBlindBoxDetail(route.params.id);
+  }
   stockAutoDraw();
 });
 

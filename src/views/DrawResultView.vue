@@ -73,11 +73,13 @@ const goRedeem = () => {
   router.push({ name: 'profile' });
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await store.ensureInitialized();
   if (!store.lastResult) {
     const fallbackId = route.query.boxId ?? store.mostPopular[0]?.id;
     if (fallbackId) {
       router.replace({ name: 'detail', params: { id: fallbackId } });
+      return;
     }
   }
 });

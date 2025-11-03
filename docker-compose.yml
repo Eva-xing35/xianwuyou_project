@@ -1,0 +1,59 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-blindbox}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-blindbox}
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./backend/database/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
+      DB_DSN: ${DB_DSN:-root:${MYSQL_ROOT_PASSWORD:-blindbox}@tcp(mysql:3306)/${MYSQL_DATABASE:-blindbox}?parseTime=true&loc=Local}
+      REDIS_ADDR: ${REDIS_ADDR:-redis:6379}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:-super-secret-demo-key}
+      AUTH_ACCESS_TOKEN_TTL: ${AUTH_ACCESS_TOKEN_TTL:-2h}
+      AUTH_VERIFICATION_TTL: ${AUTH_VERIFICATION_TTL:-5m}
+      LIMIT_DRAW_PER_MINUTE: ${LIMIT_DRAW_PER_MINUTE:-10}
+      LIMIT_DRAW_QPS: ${LIMIT_DRAW_QPS:-100}
+    ports:
+      - "8080:8080"
+    command: ["/app/blindbox"]
+
+volumes:
+  mysql-data:
+  redis-data:

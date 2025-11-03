@@ -13,6 +13,8 @@ type AppConfig struct {
     Redis    RedisConfig    `envPrefix:"REDIS_"`
     Auth     AuthConfig     `envPrefix:"AUTH_"`
     Limits   LimitConfig    `envPrefix:"LIMIT_"`
+    SMS      SMSConfig      `envPrefix:"SMS_"`
+    Logging  LoggingConfig  `envPrefix:"LOG_"`
 }
 
 type ServerConfig struct {
@@ -47,6 +49,20 @@ type AuthConfig struct {
 type LimitConfig struct {
     DrawPerMinute int `env:"DRAW_PER_MINUTE" envDefault:"10"`
     DrawQPS       int `env:"DRAW_QPS" envDefault:"100"`
+}
+
+type SMSConfig struct {
+    Provider   string        `env:"PROVIDER" envDefault:"mock"`
+    Endpoint   string        `env:"ENDPOINT"`
+    APIKey     string        `env:"API_KEY"`
+    APISecret  string        `env:"API_SECRET"`
+    SignName   string        `env:"SIGN_NAME"`
+    TemplateID string        `env:"TEMPLATE_ID"`
+    Timeout    time.Duration `env:"TIMEOUT" envDefault:"3s"`
+}
+
+type LoggingConfig struct {
+    Level string `env:"LEVEL" envDefault:"info"`
 }
 
 func Load() (*AppConfig, error) {

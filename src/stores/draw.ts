@@ -1,5 +1,7 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
+import { fetchBlindBoxDetail, fetchBlindBoxes, fetchProfile, performDraw, redeemPrize } from '../services/api';
+import { useAuthStore } from './auth';
 
 export type Rarity = 'UR' | 'SR' | 'R';
 
@@ -10,6 +12,7 @@ export interface BlindBox {
   description: string;
   price: number;
   stock: number;
+  totalStock: number;
   cover: string;
   gallery: string[];
   rarityRates: Record<Rarity, number>;
@@ -25,129 +28,188 @@ export interface PrizeItem {
   status: '\u672a\u5151\u6362' | '\u5df2\u5151\u6362';
 }
 
-// Pinia store centralising blind box catalog, draw history, and wallet data
+interface CategoryGroup {
+  name: string;
+  items: BlindBox[];
+}
+
+const DEFAULT_GALLERY = (cover: string) => [cover];
+
+const mapBlindBox = (box: {
+  id: number;
+  name: string;
+  category: string;
+  cover_url: string;
+  price: number;
+  remaining_stock: number;
+  total_stock?: number;
+  description?: string;
+}): BlindBox => ({
+  id: String(box.id),
+  name: box.name,
+  category: box.category,
+  description: box.description ?? '',
+  price: box.price,
+  stock: box.remaining_stock,
+  totalStock: box.total_stock ?? box.remaining_stock,
+  cover: box.cover_url,
+  gallery: DEFAULT_GALLERY(box.cover_url),
+  rarityRates: { UR: 0, SR: 0, R: 0 }
+});
+
+const mapPrizeItem = (record: {
+  id: number;
+  blind_box_id: number;
+  prize_id: number;
+  draw_time: string;
+  status: string;
+  prize?: { id: number; name: string; image_url: string; level: Rarity };
+}): PrizeItem => ({
+  id: String(record.id),
+  blindBoxId: String(record.blind_box_id),
+  name: record.prize?.name ?? `Prize #${record.prize_id}`,
+  rarity: record.prize?.level ?? 'R',
+  thumbnail: record.prize?.image_url ?? '/images/prize-placeholder.png',
+  obtainedAt: record.draw_time,
+  status: record.status === '\u5df2\u5151\u6362' ? '\u5df2\u5151\u6362' : '\u672a\u5151\u6362'
+});
+
 export const useDrawStore = defineStore('draw', () => {
-  const blindBoxes = ref<BlindBox[]>([
-    {
-      id: '1',
-      name: '\u8d5b\u535a\u670b\u514b\u7cfb\u5217',
-      category: '\u6f6e\u73a9',
-      description: '\u878d\u5408\u8d5b\u535a\u670b\u514b\u4e0e\u6f6e\u73a9\u6587\u5316\u7684\u8054\u540d\u7cfb\u5217\uff0c\u6bcf\u4e2a\u76f2\u76d2\u90fd\u5e26\u6765\u9713\u8679\u8dc3\u52a8\u611f\u3002',
-      price: 39.9,
-      stock: 86,
-      cover: '/images/cyberpunk-cover.png',
-      gallery: ['/images/cyberpunk-front.png', '/images/cyberpunk-side.png', '/images/cyberpunk-top.png'],
-      rarityRates: { UR: 0.05, SR: 0.25, R: 0.7 }
-    },
-    {
-      id: '2',
-      name: '\u6f6e\u6d41\u624b\u529e\u6d3e\u5bf9',
-      category: '\u624b\u529e',
-      description: '\u6f6e\u6d41\u827a\u672f\u5bb6\u4eb2\u81ea\u64cd\u5200\uff0c\u6bcf\u671f\u53ea\u4e0a\u7ebf 200 \u4efd\u7684\u9650\u91cf\u6d3e\u5bf9\u624b\u529e\u3002',
-      price: 59.9,
-      stock: 42,
-      cover: '/images/figurine-cover.png',
-      gallery: ['/images/figurine-front.png', '/images/figurine-side.png', '/images/figurine-top.png'],
-      rarityRates: { UR: 0.08, SR: 0.32, R: 0.6 }
-    },
-    {
-      id: '3',
-      name: '\u6570\u7801\u670b\u514b\u5468\u8fb9',
-      category: '\u6570\u7801\u5468\u8fb9',
-      description: '\u8de8\u6b21\u5143\u7684\u6570\u7801\u6f6e\u6d41\u5468\u8fb9\uff0c\u6bcf\u4ef6\u90fd\u5e26\u6765\u672a\u6765\u611f\u548c\u5b9e\u7528\u5ea6\u3002',
-      price: 29.9,
-      stock: 125,
-      cover: '/images/digital-cover.png',
-      gallery: ['/images/digital-front.png', '/images/digital-side.png', '/images/digital-top.png'],
-      rarityRates: { UR: 0.03, SR: 0.2, R: 0.77 }
-    }
-  ]);
+  const authStore = useAuthStore();
+
+  const blindBoxes = ref<BlindBox[]>([]);
+  const isCatalogLoading = ref(false);
+  const drawLoading = ref(false);
+  const isInitialized = ref(false);
+  const initPromise = ref<Promise<void> | null>(null);
 
   const prizes = ref<PrizeItem[]>([]);
-  const loading = ref(false);
   const lastResult = ref<PrizeItem | null>(null);
-
-  const totalPoints = computed(() =>
-    prizes.value.reduce((acc, item) => {
-      const bonus = item.rarity === 'UR' ? 600 : item.rarity === 'SR' ? 240 : 80;
-      return acc + bonus;
-    }, 0)
-  );
-
-  const balance = ref(188.8);
+  const points = ref(0);
+  const balance = ref(0);
 
   const mostPopular = computed(() => blindBoxes.value.slice(0, 2));
 
-  const categories = computed(() => {
-    const map = new Map<string, BlindBox[]>();
+  const categories = computed<CategoryGroup[]>(() => {
+    const buckets = new Map<string, BlindBox[]>();
     blindBoxes.value.forEach((box) => {
-      const list = map.get(box.category) ?? [];
+      const list = buckets.get(box.category) ?? [];
       list.push(box);
-      map.set(box.category, list);
+      buckets.set(box.category, list);
     });
-    return Array.from(map.entries()).map(([name, items]) => ({ name, items }));
+    return Array.from(buckets.entries()).map(([name, items]) => ({ name, items }));
   });
 
-  // Draw simulation: supports single/ten draws and adds a delay to match loading animation
-  const simulateDraw = async (blindBoxId: string, count = 1) => {
-    const target = blindBoxes.value.find((item) => item.id === blindBoxId);
-    if (!target) return [];
+  const totalPoints = computed(() => points.value);
 
-    loading.value = true;
-    await new Promise((resolve) => setTimeout(resolve, 1600));
-    const results: PrizeItem[] = [];
-
-    for (let i = 0; i < count; i += 1) {
-      const rarity = rollRarity(target.rarityRates);
-      const prize: PrizeItem = {
-        id: `${Date.now()}-${Math.random()}`,
-        blindBoxId,
-        name: `${target.name} #${Math.floor(Math.random() * 999)}`,
-        rarity,
-        thumbnail: `/images/${rarity.toLowerCase()}-reward.png`,
-        obtainedAt: new Date().toISOString(),
-        status: '\u672a\u5151\u6362'
-      };
-      results.push(prize);
-    }
-
-    prizes.value = [...results, ...prizes.value];
-    lastResult.value = results[0] ?? null;
-    if (target.stock > 0) {
-      target.stock = Math.max(target.stock - count, 0);
-    }
-    balance.value = Math.max(balance.value - target.price * count, 0);
-    loading.value = false;
-    return results;
+  const ensureInitialized = async () => {
+    if (isInitialized.value) return;
+    if (initPromise.value) return initPromise.value;
+    initPromise.value = (async () => {
+      await authStore.ensureDemoSession();
+      await Promise.all([loadBlindBoxes(), loadProfile()]);
+      isInitialized.value = true;
+    })().finally(() => {
+      initPromise.value = null;
+    });
+    return initPromise.value;
   };
 
-  const markRedeemed = (id: string) => {
-    const item = prizes.value.find((prize) => prize.id === id);
-    if (item) item.status = '\u5df2\u5151\u6362';
+  const loadBlindBoxes = async () => {
+    if (isCatalogLoading.value) return;
+    isCatalogLoading.value = true;
+    try {
+      const { list } = await fetchBlindBoxes({ page: 1, size: 12 });
+      blindBoxes.value = list.map(mapBlindBox);
+    } finally {
+      isCatalogLoading.value = false;
+    }
+  };
+
+  const applyDetail = (detail: Awaited<ReturnType<typeof fetchBlindBoxDetail>>) => {
+    const rarityRates: Record<Rarity, number> = { UR: 0, SR: 0, R: 0 };
+    detail.prizes.forEach((prize) => {
+      const level = prize.level as Rarity;
+      rarityRates[level] = (rarityRates[level] ?? 0) + prize.probability;
+    });
+
+    const enriched: BlindBox = {
+      id: String(detail.id),
+      name: detail.name,
+      category: detail.category,
+      description: detail.description ?? '',
+      price: detail.price,
+      stock: detail.remaining_stock,
+      totalStock: detail.total_stock ?? detail.remaining_stock,
+      cover: detail.cover_url,
+      gallery: detail.gallery && detail.gallery.length ? detail.gallery : DEFAULT_GALLERY(detail.cover_url),
+      rarityRates
+    };
+
+    const index = blindBoxes.value.findIndex((item) => item.id === enriched.id);
+    if (index >= 0) {
+      blindBoxes.value.splice(index, 1, enriched);
+    } else {
+      blindBoxes.value.push(enriched);
+    }
+  };
+
+  const loadBlindBoxDetail = async (id: string) => {
+    const detail = await fetchBlindBoxDetail(id);
+    applyDetail(detail);
+  };
+
+  const loadProfile = async () => {
+    const profile = await fetchProfile();
+    points.value = profile.user.points;
+    balance.value = profile.user.balance ?? 0;
+    prizes.value = profile.records.map(mapPrizeItem);
+  };
+
+  const performDrawAction = async (blindBoxId: string, count = 1) => {
+    if (drawLoading.value) return;
+    drawLoading.value = true;
+    try {
+      let latestPrize: PrizeItem | undefined;
+      const iterations = Math.max(1, count);
+      for (let i = 0; i < iterations; i += 1) {
+        const response = await performDraw({ blind_box_id: Number(blindBoxId) });
+        const prize = mapPrizeItem({ ...response.record, prize: response.prize });
+        prizes.value = [prize, ...prizes.value];
+        latestPrize = prize;
+      }
+      if (latestPrize) {
+        lastResult.value = latestPrize;
+      }
+      await Promise.all([loadProfile(), loadBlindBoxDetail(blindBoxId)]);
+      return latestPrize;
+    } finally {
+      drawLoading.value = false;
+    }
+  };
+
+  const markRedeemed = async (id: string, address = '\u9ed8\u8ba4\u5730\u5740 - \u8bf7\u5728\u4e2a\u4eba\u4e2d\u5fc3\u5b8c\u5584') => {
+    await redeemPrize({ record_id: Number(id), address });
+    prizes.value = prizes.value.map((item) =>
+      item.id === id ? { ...item, status: '\u5df2\u5151\u6362' } : item
+    );
+    await loadProfile();
   };
 
   return {
     blindBoxes,
     prizes,
-    loading,
     lastResult,
     totalPoints,
     balance,
     mostPopular,
     categories,
-    simulateDraw,
+    loading: computed(() => drawLoading.value),
+    ensureInitialized,
+    loadBlindBoxes,
+    loadBlindBoxDetail,
+    loadProfile,
+    performDraw: performDrawAction,
     markRedeemed
   };
 });
-
-function rollRarity(rarityRates: Record<Rarity, number>): Rarity {
-  const seed = Math.random();
-  let cumulative = 0;
-  for (const rarity of ['UR', 'SR', 'R'] as Rarity[]) {
-    cumulative += rarityRates[rarity];
-    if (seed <= cumulative) {
-      return rarity;
-    }
-  }
-  return 'R';
-}

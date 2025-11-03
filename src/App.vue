@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { RouterLink, RouterView, useRouter } from 'vue-router';
 import BaseButton from './components/BaseButton.vue';
 import { useDrawStore } from './stores/draw';
@@ -83,6 +83,12 @@ const goDraw = () => {
   if (!ctaTarget.value) return;
   router.push({ name: 'detail', params: { id: ctaTarget.value.id } });
 };
+
+onMounted(() => {
+  drawStore.ensureInitialized().catch((error) => {
+    console.error('[app] initialisation failed', error);
+  });
+});
 </script>
 
 <style scoped>

@@ -1,232 +1,267 @@
 package services
 
 import (
-    "context"
-    "crypto/rand"
-    "encoding/base64"
-    "errors"
-    "fmt"
-    "math"
-    "math/big"
-    "time"
+	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
+	"fmt"
+	"math"
+	"math/big"
+	"time"
 
-    "github.com/example/blindbox-backend/internal/config"
-    "github.com/example/blindbox-backend/internal/models"
-    "github.com/example/blindbox-backend/internal/repositories"
-    "github.com/example/blindbox-backend/internal/utils"
-    "github.com/redis/go-redis/v9"
-    "gorm.io/gorm"
+	"github.com/example/blindbox-backend/internal/config"
+	"github.com/example/blindbox-backend/internal/models"
+	"github.com/example/blindbox-backend/internal/repositories"
+	"github.com/example/blindbox-backend/internal/sms"
+	"github.com/example/blindbox-backend/internal/utils"
+	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 var (
-    ErrInvalidCredentials = errors.New("invalid credentials")
-    ErrInsufficientPoints = errors.New("insufficient points")
+	ErrInvalidCredentials = errors.New("invalid credentials")
+	ErrInsufficientPoints = errors.New("insufficient points")
 )
 
 type ServiceLayer struct {
-    repo    *repositories.Repository
-    cfg     *config.AppConfig
-    limiter RateLimiter
+	repo    *repositories.Repository
+	cfg     *config.AppConfig
+	limiter RateLimiter
+	sms     sms.Provider
+	logger  *zap.Logger
 }
 
 type RateLimiter interface {
-    Allow(ctx context.Context, key string, limit int, window time.Duration) (bool, error)
+	Allow(ctx context.Context, key string, limit int, window time.Duration) (bool, error)
 }
 
-func NewServiceLayer(repo *repositories.Repository, cfg *config.AppConfig, limiter RateLimiter) *ServiceLayer {
-    return &ServiceLayer{repo: repo, cfg: cfg, limiter: limiter}
+func NewServiceLayer(repo *repositories.Repository, cfg *config.AppConfig, limiter RateLimiter, smsProvider sms.Provider, logger *zap.Logger) *ServiceLayer {
+	return &ServiceLayer{repo: repo, cfg: cfg, limiter: limiter, sms: smsProvider, logger: logger}
 }
 
 func (s *ServiceLayer) Register(ctx context.Context, phone, password string) (*models.User, error) {
-    hash, err := utils.HashPassword(password)
-    if err != nil {
-        return nil, err
-    }
-    user := &models.User{Phone: phone, Password: hash, Points: 0}
-    if err := s.repo.CreateUser(ctx, user); err != nil {
-        return nil, err
-    }
-    return user, nil
+	hash, err := utils.HashPassword(password)
+	if err != nil {
+		return nil, err
+	}
+	user := &models.User{Phone: phone, Password: hash, Points: 0}
+	if err := s.repo.CreateUser(ctx, user); err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (s *ServiceLayer) SendSMSCode(ctx context.Context, phone string) (string, error) {
-    buf := make([]byte, 3)
-    if _, err := rand.Read(buf); err != nil {
-        return "", err
-    }
-    code := fmt.Sprintf("%06d", int(buf[0])%1000000)
-    return code, s.repo.SaveSMSCode(ctx, phone, code, s.cfg.Auth.VerificationTTL)
+	buf := make([]byte, 3)
+	if _, err := rand.Read(buf); err != nil {
+		return "", err
+	}
+	code := fmt.Sprintf("%06d", int(buf[0])%1000000)
+	if err := s.repo.SaveSMSCode(ctx, phone, code, s.cfg.Auth.VerificationTTL); err != nil {
+		return "", err
+	}
+	if s.sms != nil {
+		if err := s.sms.SendVerificationCode(ctx, phone, code); err != nil {
+			if s.logger != nil {
+				s.logger.Error("sms send failed", zap.String("phone", phone), zap.Error(err))
+			}
+			return "", err
+		}
+	}
+	return code, nil
 }
 
 func (s *ServiceLayer) Login(ctx context.Context, phone, password, code string) (*models.User, string, error) {
-    user, err := s.repo.GetUserByPhone(ctx, phone)
-    if err != nil {
-        if errors.Is(err, repositories.ErrNotFound) {
-            return nil, "", ErrInvalidCredentials
-        }
-        return nil, "", err
-    }
+	user, err := s.repo.GetUserByPhone(ctx, phone)
+	if err != nil {
+		if errors.Is(err, repositories.ErrNotFound) {
+			return nil, "", ErrInvalidCredentials
+		}
+		return nil, "", err
+	}
 
-    if code != "" {
-        ok, err := s.repo.VerifySMSCode(ctx, phone, code)
-        if err != nil || !ok {
-            return nil, "", ErrInvalidCredentials
-        }
-    } else {
-        if err := utils.ComparePassword(user.Password, password); err != nil {
-            return nil, "", ErrInvalidCredentials
-        }
-    }
+	if code != "" {
+		ok, err := s.repo.VerifySMSCode(ctx, phone, code)
+		if err != nil || !ok {
+			return nil, "", ErrInvalidCredentials
+		}
+	} else {
+		if err := utils.ComparePassword(user.Password, password); err != nil {
+			return nil, "", ErrInvalidCredentials
+		}
+	}
 
-    token, err := utils.GenerateJWT(user.ID, s.cfg.Auth.JWTSecret, s.cfg.Auth.AccessTokenTTL)
-    if err != nil {
-        return nil, "", err
-    }
-    return user, token, nil
+	token, err := utils.GenerateJWT(user.ID, s.cfg.Auth.JWTSecret, s.cfg.Auth.AccessTokenTTL)
+	if err != nil {
+		return nil, "", err
+	}
+	return user, token, nil
 }
 
 func (s *ServiceLayer) Profile(ctx context.Context, userID uint) (*models.User, []models.DrawRecord, error) {
-    user, err := s.repo.GetUserByID(ctx, userID)
-    if err != nil {
-        return nil, nil, err
-    }
-    records, err := s.repo.GetUserPrizes(ctx, userID)
-    return user, records, err
+	user, err := s.repo.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, nil, err
+	}
+	records, err := s.repo.GetUserPrizes(ctx, userID)
+	return user, records, err
 }
 
 func (s *ServiceLayer) ListBlindBoxes(ctx context.Context, category string, page, size int) ([]models.BlindBox, int64, error) {
-    if size <= 0 {
-        size = 10
-    }
-    if size > 50 {
-        size = 50
-    }
-    if page <= 0 {
-        page = 1
-    }
-    offset := (page - 1) * size
-    return s.repo.ListBlindBoxes(ctx, category, size, offset)
+	if size <= 0 {
+		size = 10
+	}
+	if size > 50 {
+		size = 50
+	}
+	if page <= 0 {
+		page = 1
+	}
+	offset := (page - 1) * size
+	return s.repo.ListBlindBoxes(ctx, category, size, offset)
 }
 
 func (s *ServiceLayer) GetBlindBoxDetail(ctx context.Context, id uint) (*models.BlindBox, error) {
-    return s.repo.GetBlindBoxWithPrizes(ctx, id)
+	return s.repo.GetBlindBoxWithPrizes(ctx, id)
 }
 
 func (s *ServiceLayer) Draw(ctx context.Context, userID, boxID uint) (*models.DrawRecord, *models.Prize, error) {
-    limiterKey := fmt.Sprintf("draw:minute:%d", userID)
-    allowed, err := s.limiter.Allow(ctx, limiterKey, s.cfg.Limits.DrawPerMinute, time.Minute)
-    if err != nil {
-        return nil, nil, err
-    }
-    if !allowed {
-        return nil, nil, fmt.Errorf("rate limit: exceeded draws per minute")
-    }
+	limiterKey := fmt.Sprintf("draw:minute:%d", userID)
+	allowed, err := s.limiter.Allow(ctx, limiterKey, s.cfg.Limits.DrawPerMinute, time.Minute)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !allowed {
+		if s.logger != nil {
+			s.logger.Warn("rate limit exceeded per-minute", zap.Uint("user", userID), zap.Uint("box", boxID))
+		}
+		return nil, nil, fmt.Errorf("rate limit: exceeded draws per minute")
+	}
 
-    box, err := s.repo.GetBlindBoxWithPrizes(ctx, boxID)
-    if err != nil {
-        return nil, nil, err
-    }
+	box, err := s.repo.GetBlindBoxWithPrizes(ctx, boxID)
+	if err != nil {
+		return nil, nil, err
+	}
 
-    lockKey := fmt.Sprintf("lock:user:%d", userID)
-    ok, err := s.repo.AcquireLock(ctx, lockKey, 5*time.Second)
-    if err != nil {
-        return nil, nil, err
-    }
-    if !ok {
-        return nil, nil, fmt.Errorf("retry: user busy")
-    }
-    defer s.repo.ReleaseLock(ctx, lockKey)
+	lockKey := fmt.Sprintf("lock:user:%d", userID)
+	ok, err := s.repo.AcquireLock(ctx, lockKey, 5*time.Second)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !ok {
+		if s.logger != nil {
+			s.logger.Warn("lock busy", zap.Uint("user", userID))
+		}
+		return nil, nil, fmt.Errorf("retry: user busy")
+	}
+	defer s.repo.ReleaseLock(ctx, lockKey)
 
-    user, err := s.repo.GetUserByID(ctx, userID)
-    if err != nil {
-        return nil, nil, err
-    }
+	user, err := s.repo.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, nil, err
+	}
 
-    if user.Points < box.Price {
-        return nil, nil, ErrInsufficientPoints
-    }
+	if user.Points < box.Price {
+		return nil, nil, ErrInsufficientPoints
+	}
 
-    prize, err := weightedRandom(box.Prizes)
-    if err != nil {
-        return nil, nil, err
-    }
+	prize, err := weightedRandom(box.Prizes)
+	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("weighted random failed", zap.Uint("box", boxID), zap.Error(err))
+		}
+		return nil, nil, err
+	}
 
-    record := &models.DrawRecord{
-        UserID:     userID,
-        BlindBoxID: boxID,
-        PrizeID:    prize.ID,
-        DrawTime:   time.Now(),
-        Status:     "\u672a\u5151\u6362",
-    }
+	record := &models.DrawRecord{
+		UserID:     userID,
+		BlindBoxID: boxID,
+		PrizeID:    prize.ID,
+		DrawTime:   time.Now(),
+		Status:     "\u672a\u5151\u6362",
+	}
 
-    err = s.repo.WithTransaction(ctx, func(tx *gorm.DB) error {
-        if err := s.repo.UpdateBlindBoxStock(tx, boxID, -1); err != nil {
-            return err
-        }
-        if err := s.repo.UpdatePrizeStock(tx, prize.ID, -1); err != nil {
-            return err
-        }
-        res := tx.Model(&models.User{}).
-            Where("id = ? AND points >= ?", userID, box.Price).
-            UpdateColumn("points", gorm.Expr("points - ?", box.Price))
-        if res.Error != nil {
-            return res.Error
-        }
-        if res.RowsAffected == 0 {
-            return ErrInsufficientPoints
-        }
-        if err := s.repo.CreateDrawRecord(tx, record); err != nil {
-            return err
-        }
-        return nil
-    })
-    if err != nil {
-        return nil, nil, err
-    }
+	err = s.repo.WithTransaction(ctx, func(tx *gorm.DB) error {
+		if err := s.repo.UpdateBlindBoxStock(tx, boxID, -1); err != nil {
+			return err
+		}
+		if err := s.repo.UpdatePrizeStock(tx, prize.ID, -1); err != nil {
+			return err
+		}
+		res := tx.Model(&models.User{}).
+			Where("id = ? AND points >= ?", userID, box.Price).
+			UpdateColumn("points", gorm.Expr("points - ?", box.Price))
+		if res.Error != nil {
+			if s.logger != nil {
+				s.logger.Error("update points failed", zap.Error(res.Error))
+			}
+			return res.Error
+		}
+		if res.RowsAffected == 0 {
+			return ErrInsufficientPoints
+		}
+		if err := s.repo.CreateDrawRecord(tx, record); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		if s.logger != nil {
+			s.logger.Error("draw transaction failed", zap.Uint("user", userID), zap.Uint("box", boxID), zap.Error(err))
+		}
+		return nil, nil, err
+	}
 
-    return record, prize, nil
+	return record, prize, nil
 }
 
 func (s *ServiceLayer) Redeem(ctx context.Context, userID, recordID uint, address string) error {
-    tracking := fakeTrackingNo()
-    return s.repo.MarkRedeemed(ctx, userID, recordID, address, tracking)
+	tracking := fakeTrackingNo()
+	if err := s.repo.MarkRedeemed(ctx, userID, recordID, address, tracking); err != nil {
+		if s.logger != nil {
+			s.logger.Warn("redeem failed", zap.Uint("user", userID), zap.Uint("record", recordID), zap.Error(err))
+		}
+		return err
+	}
+	return nil
 }
 
 func weightedRandom(prizes []models.Prize) (*models.Prize, error) {
-    if len(prizes) == 0 {
-        return nil, errors.New("empty prize pool")
-    }
-    var total float64
-    for _, p := range prizes {
-        total += p.Probability
-    }
-    if total <= 0 {
-        return nil, errors.New("invalid probability sum")
-    }
-    rnd, err := randFloat64()
-    if err != nil {
-        return nil, err
-    }
-    cumulative := 0.0
-    for i := range prizes {
-        cumulative += prizes[i].Probability / total
-        if rnd <= cumulative {
-            return &prizes[i], nil
-        }
-    }
-    return &prizes[len(prizes)-1], nil
+	if len(prizes) == 0 {
+		return nil, errors.New("empty prize pool")
+	}
+	var total float64
+	for _, p := range prizes {
+		total += p.Probability
+	}
+	if total <= 0 {
+		return nil, errors.New("invalid probability sum")
+	}
+	rnd, err := randFloat64()
+	if err != nil {
+		return nil, err
+	}
+	cumulative := 0.0
+	for i := range prizes {
+		cumulative += prizes[i].Probability / total
+		if rnd <= cumulative {
+			return &prizes[i], nil
+		}
+	}
+	return &prizes[len(prizes)-1], nil
 }
 
 func randFloat64() (float64, error) {
-    n, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
-    if err != nil {
-        return 0, err
-    }
-    return float64(n.Int64()) / float64(math.MaxInt64), nil
+	n, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
+	if err != nil {
+		return 0, err
+	}
+	return float64(n.Int64()) / float64(math.MaxInt64), nil
 }
 
 func fakeTrackingNo() string {
-    buf := make([]byte, 8)
-    rand.Read(buf)
-    return "LX" + base64.RawURLEncoding.EncodeToString(buf)
+	buf := make([]byte, 8)
+	rand.Read(buf)
+	return "LX" + base64.RawURLEncoding.EncodeToString(buf)
 }
