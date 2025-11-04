@@ -1,0 +1,67 @@
+<view class="page-container">
+  <view class="card status-card">
+    <view class="status-header">
+      <text class="title">自动接单</text>
+      <switch checked="{{autoAccept}}" bindchange="handleAutoAcceptChange" color="#2563EB" />
+    </view>
+    <text class="status-desc">开启后将自动接受符合条件的订单</text>
+  </view>
+
+  <view class="summary-grid">
+    <view class="summary-item card">
+      <text class="label">待接订单</text>
+      <text class="value">{{summary.waitingOrders}}</text>
+    </view>
+    <view class="summary-item card">
+      <text class="label">今日完成</text>
+      <text class="value">{{summary.todayCompleted}}</text>
+    </view>
+    <view class="summary-item card">
+      <text class="label">今日收益（元）</text>
+      <text class="value earnings">{{summary.todayEarnings}}</text>
+    </view>
+    <view class="summary-item card">
+      <text class="label">司机评分</text>
+      <text class="value">{{summary.rating}}</text>
+    </view>
+  </view>
+
+  <view class="card order-entry" bindtap="navigateToOrderList">
+    <view class="entry-text">
+      <text class="title">订单中心</text>
+      <text class="desc">查看待接订单及行程安排</text>
+    </view>
+    <text class="arrow">›</text>
+  </view>
+
+  <view wx:if="{{incomingOrder}}" class="modal-mask" catchtouchmove="true">
+    <view class="modal-content">
+      <text class="modal-title">新订单提醒</text>
+      <view class="modal-row">
+        <text class="label">上车点</text>
+        <text class="value">{{incomingOrder.origin}}</text>
+      </view>
+      <view class="modal-row">
+        <text class="label">下车点</text>
+        <text class="value">{{incomingOrder.destination}}</text>
+      </view>
+      <view class="modal-row">
+        <text class="label">发车时间</text>
+        <text class="value">{{incomingOrder.departureTime}}</text>
+      </view>
+      <view class="modal-row">
+        <text class="label">预估费用</text>
+        <text class="value highlight">￥{{incomingOrder.fare}}</text>
+      </view>
+      <view class="modal-actions">
+        <button class="reject" bindtap="handleRejectIncoming">拒单</button>
+        <button class="accept" bindtap="handleAcceptIncoming">接单</button>
+      </view>
+      <button class="modal-close" bindtap="closeIncomingModal">暂不处理</button>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-hint">
+    <text>加载中…</text>
+  </view>
+</view>

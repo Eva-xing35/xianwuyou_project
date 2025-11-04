@@ -1,0 +1,24 @@
+<view class="page-container">
+  <view wx:if="{{list.length}}">
+    <block wx:for="{{list}}" wx:key="id">
+      <view class="card history-item" data-order-id="{{item.orderId}}" bindtap="goToDetail">
+        <view class="row">
+          <text class="title">订单号 {{item.orderId}}</text>
+          <text class="amount">￥{{item.amount}}</text>
+        </view>
+        <view class="row">
+          <text class="label">结算状态</text>
+          <text class="status">{{item.settlementStatus}}</text>
+        </view>
+        <view class="row">
+          <text class="label">更新时间</text>
+          <text class="value">{{item.settledAt}}</text>
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{loading}}" class="loading">加载中…</view>
+    <view wx:elif="{{!hasMore}}" class="loading">没有更多记录了</view>
+  </view>
+
+  <view wx:else class="empty">暂无收益记录</view>
+</view>

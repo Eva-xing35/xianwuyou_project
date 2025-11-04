@@ -1,0 +1,38 @@
+<view class="page-container">
+  <view wx:if="{{list.length}}">
+    <block wx:for="{{list}}" wx:key="id">
+      <view class="card progress-item">
+        <view class="header">
+          <text class="amount">￥{{item.amount}}</text>
+          <text class="status">{{item.statusText}}</text>
+        </view>
+        <view class="row">
+          <text class="label">账户类型</text>
+          <text class="value">{{item.accountType === 'corporate' ? '对公账户' : '对私账户'}}</text>
+        </view>
+        <view class="row">
+          <text class="label">提交时间</text>
+          <text class="value">{{item.appliedAt}}</text>
+        </view>
+        <view class="row">
+          <text class="label">最新进度</text>
+          <text class="value">{{item.updatedAt}}</text>
+        </view>
+        <view class="timeline" wx:if="{{item.timeline?.length}}">
+          <block wx:for="{{item.timeline}}" wx:key="time">
+            <view class="timeline-row">
+              <view class="dot {{item.completed ? 'done' : ''}}"></view>
+              <view class="timeline-text">
+                <text class="title">{{item.title}}</text>
+                <text class="time">{{item.time}}</text>
+              </view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{loading}}" class="loading">刷新中…</view>
+  </view>
+
+  <view wx:else class="empty">暂无提现申请</view>
+</view>

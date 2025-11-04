@@ -1,0 +1,29 @@
+<view class="order-card card" bindtap="handleTap">
+  <view class="order-header">
+    <text class="order-id">订单号 {{order.id}}</text>
+    <text class="order-status">{{order.statusText}}</text>
+  </view>
+
+  <view class="order-body">
+    <view class="trip-info">
+      <text class="label">出发</text>
+      <text class="value">{{order.origin}}</text>
+    </view>
+    <view class="trip-info">
+      <text class="label">到达</text>
+      <text class="value">{{order.destination}}</text>
+    </view>
+    <view class="trip-info">
+      <text class="label">发车时间</text>
+      <text class="value">{{order.departureTime}}</text>
+    </view>
+  </view>
+
+  <view class="order-footer">
+    <text class="fare">￥{{order.fare}}</text>
+    <view class="actions" wx:if="{{order.showActions}}">
+      <button class="secondary" size="mini" type="default" catchtap="handleSecondaryAction" data-id="{{order.id}}">拒单</button>
+      <button class="primary" size="mini" type="primary" catchtap="handlePrimaryAction" data-id="{{order.id}}">接单</button>
+    </view>
+  </view>
+</view>

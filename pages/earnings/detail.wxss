@@ -1,0 +1,56 @@
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.row .label {
+  color: #6b7280;
+  font-size: 26rpx;
+}
+
+.row .value {
+  color: #1f2937;
+  font-size: 28rpx;
+}
+
+.row .highlight {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+.item-left .item-title {
+  font-size: 28rpx;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.item-left .item-desc {
+  display: block;
+  color: #9ca3af;
+  font-size: 24rpx;
+  margin-top: 4rpx;
+}
+
+.item-amount {
+  color: #2563eb;
+  font-size: 28rpx;
+}
+
+.empty {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 120rpx;
+}

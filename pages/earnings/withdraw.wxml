@@ -1,0 +1,46 @@
+<view class="page-container">
+  <view class="card">
+    <view class="section-title">提现账户</view>
+    <radio-group class="type-group" bindchange="handleAccountTypeChange" value="{{form.accountType}}">
+      <label class="type-option">
+        <radio value="personal" checked="{{form.accountType === 'personal'}}" />
+        <text>对私账户</text>
+      </label>
+      <label class="type-option">
+        <radio value="corporate" checked="{{form.accountType === 'corporate'}}" />
+        <text>对公账户</text>
+      </label>
+    </radio-group>
+
+    <view class="form-item">
+      <text class="label">开户名称</text>
+      <input class="input" placeholder="请输入开户名称" value="{{form.accountName}}" data-field="accountName" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.accountName}}">{{errors.accountName}}</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">银行账号</text>
+      <input class="input" placeholder="请输入银行卡号" value="{{form.bankAccount}}" data-field="bankAccount" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.bankAccount}}">{{errors.bankAccount}}</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">证件号码</text>
+      <input class="input" placeholder="请输入身份证或营业执照号" value="{{form.idNumber}}" data-field="idNumber" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.idNumber}}">{{errors.idNumber}}</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">提现金额（元）</text>
+      <input class="input" type="number" placeholder="请输入提现金额" value="{{form.amount}}" data-field="amount" bindinput="handleInput" />
+      <text class="error" wx:if="{{errors.amount}}">{{errors.amount}}</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">备注</text>
+      <textarea class="textarea" placeholder="可填写发票信息或补充说明" value="{{form.remark}}" data-field="remark" bindinput="handleInput"></textarea>
+    </view>
+  </view>
+
+  <button class="primary-btn submit-btn" bindtap="submit">提交申请</button>
+</view>

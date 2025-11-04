@@ -1,0 +1,55 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/orders/index",
+    "pages/orders/detail",
+    "pages/earnings/index",
+    "pages/earnings/history",
+    "pages/earnings/detail",
+    "pages/earnings/withdraw",
+    "pages/profile/index",
+    "pages/profile/history",
+    "pages/profile/withdraw-status"
+  ],
+  "window": {
+    "navigationBarTitleText": "司机履约中心",
+    "navigationBarBackgroundColor": "#1F2937",
+    "navigationBarTextStyle": "white",
+    "backgroundTextStyle": "light",
+    "backgroundColor": "#F5F6FA"
+  },
+  "tabBar": {
+    "color": "#6B7280",
+    "selectedColor": "#2563EB",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "assets/icons/home.png",
+        "selectedIconPath": "assets/icons/home-active.png"
+      },
+      {
+        "pagePath": "pages/orders/index",
+        "text": "订单",
+        "iconPath": "assets/icons/orders.png",
+        "selectedIconPath": "assets/icons/orders-active.png"
+      },
+      {
+        "pagePath": "pages/earnings/index",
+        "text": "收益",
+        "iconPath": "assets/icons/earnings.png",
+        "selectedIconPath": "assets/icons/earnings-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "assets/icons/profile.png",
+        "selectedIconPath": "assets/icons/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

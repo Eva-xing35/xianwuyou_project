@@ -1,0 +1,67 @@
+<view class="page-container" wx:if="{{order}}">
+  <view class="card">
+    <view class="section-title">行程信息</view>
+    <view class="row" data-value="{{order.origin}}" bindtap="copyAddress">
+      <text class="label">上车点</text>
+      <text class="value">{{order.origin}}</text>
+    </view>
+    <view class="row" data-value="{{order.destination}}" bindtap="copyAddress">
+      <text class="label">下车点</text>
+      <text class="value">{{order.destination}}</text>
+    </view>
+    <view class="row">
+      <text class="label">发车时间</text>
+      <text class="value">{{order.departureTime}}</text>
+    </view>
+    <view class="row">
+      <text class="label">乘客人数</text>
+      <text class="value">{{order.passengerCount}}</text>
+    </view>
+    <view class="row">
+      <text class="label">订单金额</text>
+      <text class="value highlight">￥{{order.fare}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">乘客联系</view>
+    <view class="row">
+      <text class="label">联系人</text>
+      <text class="value">{{order.customerName}}</text>
+    </view>
+    <view class="row">
+      <text class="label">联系电话</text>
+      <text class="value">{{order.customerPhone}}</text>
+      <button class="mini-btn" size="mini" bindtap="callCustomer">拨打</button>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">导航路线</view>
+    <button class="primary-btn" bindtap="handleNavigation" loading="{{loadingRoute}}">调用谷歌地图</button>
+    <view class="steps" wx:if="{{routeSteps.length}}">
+      <block wx:for="{{routeSteps}}" wx:key="index">
+        <view class="step-item">
+          <text class="step-index">{{item.index}}</text>
+          <view class="step-body">
+            <text class="instruction">{{item.instruction}}</text>
+            <text class="secondary">{{item.distance}} · {{item.duration}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">订单状态</view>
+    <view class="status-line">
+      <text class="tag">{{order.statusText}}</text>
+    </view>
+    <view class="actions" wx:if="{{order.status === 'pending'}}">
+      <button class="danger-btn" bindtap="handleReject">拒单</button>
+      <button class="primary-btn" bindtap="handleAccept">接单</button>
+    </view>
+  </view>
+</view>
+
+<view wx:else class="empty">订单加载中…</view>
