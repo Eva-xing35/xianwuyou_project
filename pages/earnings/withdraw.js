@@ -36,19 +36,19 @@ Page({
     const errors = {};
 
     if (!validators.validateRequired(form.accountName)) {
-      errors.accountName = "???????";
+      errors.accountName = "请输入账户名称";
     }
 
     if (!validators.validateBankAccount(form.bankAccount, form.accountType === "corporate" ? "corporate" : "personal")) {
-      errors.bankAccount = form.accountType === "corporate" ? "??????12-30???" : "??????10-18???";
+      errors.bankAccount = form.accountType === "corporate" ? "请输入12-30位对公账号" : "请输入10-18位银行卡号";
     }
 
     if (!validators.validateRequired(form.idNumber) || !validators.validateIdNumber(form.idNumber)) {
-      errors.idNumber = "????????";
+      errors.idNumber = "请输入有效身份证号";
     }
 
     if (!form.amount || Number(form.amount) <= 0) {
-      errors.amount = "?????0???";
+      errors.amount = "请输入大于0的金额";
     }
 
     this.setData({ errors });
@@ -59,7 +59,7 @@ Page({
     if (!this.validate()) return;
     try {
       await earningsService.submitWithdrawApplication(this.data.form);
-      wx.showToast({ title: "????", icon: "success" });
+      wx.showToast({ title: "提交成功", icon: "success" });
       setTimeout(() => {
         wx.navigateBack({ delta: 1 });
       }, 1200);

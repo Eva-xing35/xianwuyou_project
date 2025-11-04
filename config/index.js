@@ -1,6 +1,6 @@
 const config = {
   apiBaseUrl: "https://api.example.com/driver",
-  googleMapsApiKey: "YOUR_GOOGLE_MAPS_API_KEY",
+  googleMapsApiKey: "AIzaSyBWY23uZu_DjvuFvy-UT10-QcVUxbBuNoo",
   pageSize: 10
 };
 

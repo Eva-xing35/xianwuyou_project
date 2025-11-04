@@ -43,11 +43,11 @@ Page({
     const { form } = this.data;
     const errors = {};
 
-    if (!validators.validateRequired(form.name)) errors.name = "?????";
-    if (!validators.validatePhone(form.phone)) errors.phone = "????????";
-    if (!validators.validateIdNumber(form.idNumber)) errors.idNumber = "????????";
-    if (!validators.validateRequired(form.vehicleNumber)) errors.vehicleNumber = "??????";
-    if (!validators.validateRequired(form.driverLicense)) errors.driverLicense = "???????";
+    if (!validators.validateRequired(form.name)) errors.name = "请填写姓名";
+    if (!validators.validatePhone(form.phone)) errors.phone = "请输入有效手机号";
+    if (!validators.validateIdNumber(form.idNumber)) errors.idNumber = "请输入有效身份证号";
+    if (!validators.validateRequired(form.vehicleNumber)) errors.vehicleNumber = "请填写车牌号";
+    if (!validators.validateRequired(form.driverLicense)) errors.driverLicense = "请填写驾驶证号";
 
     this.setData({ errors });
     return Object.keys(errors).length === 0;
@@ -57,7 +57,7 @@ Page({
     if (!this.validate()) return;
     try {
       await profileService.updateProfile(this.data.form);
-      wx.showToast({ title: "????", icon: "success" });
+      wx.showToast({ title: "保存成功", icon: "success" });
     } catch (error) {
       console.error("updateProfile", error);
     }

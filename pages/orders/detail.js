@@ -15,7 +15,7 @@ Page({
       this.setData({ orderId: options.id });
       this.loadOrder();
     } else {
-      wx.showToast({ title: "???????", icon: "none" });
+      wx.showToast({ title: "缺少订单编号", icon: "none" });
     }
   },
 
@@ -26,7 +26,7 @@ Page({
   async loadOrder() {
     const { orderId } = this.data;
     if (!orderId) return;
-    wx.showLoading({ title: "???" });
+    wx.showLoading({ title: "加载中" });
     try {
       const data = await orderService.fetchOrderDetail(orderId);
       const order = {
@@ -46,20 +46,20 @@ Page({
   mapStatus(status) {
     switch (status) {
       case "pending":
-        return "???";
+        return "待接单";
       case "accepted":
-        return "???";
+        return "进行中";
       case "completed":
-        return "???";
+        return "已完成";
       default:
-        return "??";
+        return "未知";
     }
   },
 
   callCustomer() {
     const phone = this.data.order?.customerPhone;
     if (!phone) {
-      wx.showToast({ title: "??????", icon: "none" });
+      wx.showToast({ title: "暂无乘客电话", icon: "none" });
       return;
     }
     wx.makePhoneCall({ phoneNumber: phone });
@@ -76,7 +76,7 @@ Page({
     if (!order) return;
     try {
       await orderService.acceptOrder(order.id);
-      wx.showToast({ title: "????", icon: "success" });
+      wx.showToast({ title: "接单成功", icon: "success" });
       this.loadOrder();
     } catch (error) {
       console.error("accept order", error);
@@ -88,7 +88,7 @@ Page({
     if (!order) return;
     try {
       await orderService.rejectOrder(order.id);
-      wx.showToast({ title: "??????", icon: "none" });
+      wx.showToast({ title: "已拒绝订单", icon: "none" });
       this.loadOrder();
     } catch (error) {
       console.error("reject order", error);
@@ -98,7 +98,7 @@ Page({
   async handleNavigation() {
     const order = this.data.order;
     if (!order?.originLocation || !order?.destinationLocation) {
-      wx.showToast({ title: "??????", icon: "none" });
+      wx.showToast({ title: "缺少行程位置信息", icon: "none" });
       return;
     }
     this.setData({ loadingRoute: true, routeSteps: [] });
@@ -124,7 +124,7 @@ Page({
       });
     } catch (error) {
       console.error("handleNavigation", error);
-      wx.showToast({ title: "????", icon: "none" });
+      wx.showToast({ title: "导航失败", icon: "none" });
     } finally {
       this.setData({ loadingRoute: false });
     }
